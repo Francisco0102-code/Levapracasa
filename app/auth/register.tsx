@@ -33,7 +33,7 @@ import {
         const response = await fetch("http://localhost:8000/api/register", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, type: "driver", tel, password }),
+          body: JSON.stringify({ name, email, tel, password }),
         });
   
         const data = await response.json();
@@ -70,12 +70,18 @@ import {
   
           <InputField label="Nome Completo" value={name} onChangeText={setName} placeholder="Digite seu nome" />
           <InputField label="Email" value={email} onChangeText={setEmail} placeholder="Digite seu email" keyboardType="email-address" />
-          <InputField label="Telefone/WhatsApp" value={tel} onChangeText={setTel} placeholder="(XX) XXXXX-XXXX" keyboardType="phone-pad" />
+          <InputField label="Telefone/WhatsApp" value={tel} onChangeText={setTel} placeholder="(XX) XXXXX-XXXX" keyboardType="numeric" />
           <InputField label="Senha" value={password} onChangeText={setPassword} placeholder="Digite sua senha" secureTextEntry />
   
-          <Pressable style={styles.button} onPress={handleSaveUserDriver} disabled={loading}>
+          <Pressable style={styles.button} onPress={handleSaveUserDriver} disabled={loading} >
             {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Cadastrar</Text>}
           </Pressable>
+
+          <Pressable onPress={() => router.push('/auth/login')}>
+  <Text style={styles.loginText}>
+    Já tem uma conta? Faça login aqui.
+  </Text>
+</Pressable>
         </ScrollView>
       </View>
     );
@@ -143,6 +149,18 @@ import {
       fontSize: 16,
       fontWeight: "bold",
     },
+    loginText: {
+      marginTop: 16,
+      color: "#007BFF",
+      textAlign: "center",
+      textDecorationLine: "underline",
+      fontSize: 14,
+    },
+    errorText: {
+      color: "red",
+      marginTop: 8,
+      textAlign: "center",
+    },    
   });
   
   export default Register;
