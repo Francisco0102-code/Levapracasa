@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button } from 'react-native';
-import { Redirect } from 'expo-router';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button, Pressable } from 'react-native';
+import { Redirect, router } from 'expo-router';
 
 
 
@@ -20,6 +20,7 @@ const items = [
 
 const Index = () => {
   return <Redirect href="/auth/register" />;
+
   const [filter, setFilter] = useState<string | null>(null);
 
   const filteredItems = filter ? items.filter(item => item.category === filter) : items;
@@ -52,7 +53,9 @@ const Index = () => {
 
       {/* Botão de Adicionar */}
       <TouchableOpacity style={styles.addButton} onPress={() => alert('Adicionar novo item')}>
+        <Pressable onPress={() => router.push('/(tabs)/adicionar')}>
         <Text style={styles.addButtonText}>+</Text>
+        </Pressable>
       </TouchableOpacity>
     </View>
   );
