@@ -4,6 +4,7 @@ import React from 'react'
 const adicionar = () => {
   return (
     <View>
+      
       <Text>adicionar</Text>
     </View>
   )

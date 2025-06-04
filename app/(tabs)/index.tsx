@@ -1,43 +1,85 @@
 import React, { useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Button, Pressable } from 'react-native';
-import { Redirect, router } from 'expo-router';
+import {
+  View,
+  Text,
+  FlatList,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+  TextInput,
+  Pressable,
+  Alert,
+} from 'react-native';
 
-
-
-
-const items = [
+const initialItems = [
   { id: '1', name: 'Furadeira', description: 'Furadeira elétrica', location: 'São Paulo', returnDate: '30/05/2025', category: 'Ferramentas' },
   { id: '2', name: 'Livro de JavaScript', description: 'Livro sobre programação', location: 'Rio de Janeiro', returnDate: '05/06/2025', category: 'Livros' },
-  { id: '3', name: 'Notebook', description: 'Notebook Dell', location: 'Belo Horizonte', returnDate: '10/06/2025', category: 'Eletrônicos' },
-  { id: '4', name: 'Martelo', description: 'Martelo de carpinteiro', location: 'Curitiba', returnDate: '15/06/2025', category: 'Ferramentas' },
-  { id: '5', name: 'Livro de React Native', description: 'Livro sobre desenvolvimento mobile', location: 'Porto Alegre', returnDate: '20/06/2025', category: 'Livros' },
-  { id: '6', name: 'Smartphone Android', description: 'Smartphone Samsung Galaxy', location: 'Salvador', returnDate: '25/06/2025', category: 'Eletrônicos' },
-  { id: '7', name: 'Chave Inglesa', description: 'Chave inglesa ajustável', location: 'Fortaleza', returnDate: '30/06/2025', category: 'Ferramentas' },
-  { id: '8', name: 'Livro de Python', description: 'Livro sobre programação em Python', location: 'Recife', returnDate: '05/07/2025', category: 'Livros' },
-  { id: '9', name: 'Tablet', description: 'Tablet Apple iPad', location: 'Manaus', returnDate: '10/07/2025', category: 'Eletrônicos' },
-  { id: '10', name: 'Alicate', description: 'Alicate de corte', location: 'Brasília', returnDate: '15/07/2025', category: 'Ferramentas' },  
 ];
 
 const Index = () => {
-  return <Redirect href="/auth/register" />;
-
+  const [items, setItems] = useState(initialItems);
   const [filter, setFilter] = useState<string | null>(null);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  // Campos do formulário
+  const [itemName, setItemName] = useState('');
+  const [itemDesc, setItemDesc] = useState('');
+  const [itemPrice, setItemPrice] = useState('');
+  const [itemCategoryId, setItemCategoryId] = useState('');
 
   const filteredItems = filter ? items.filter(item => item.category === filter) : items;
+
+  const saveItem = async () => {
+    if (!itemName || !itemDesc || !itemPrice || !itemCategoryId) {
+      Alert.alert('Erro', 'Preencha todos os campos');
+      return;
+    }
+
+    try {
+      const response = await fetch('http://localhost:8000/api/items', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          name: itemName,
+          description: itemDesc,
+          price: parseFloat(itemPrice),
+          category_id: parseInt(itemCategoryId),
+        }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        Alert.alert('Erro', errorData.message || 'Erro ao salvar item');
+        return;
+      }
+
+      const newItem = await response.json();
+
+      setItems(prev => [...prev, newItem]);
+      Alert.alert('Sucesso', 'Item salvo com sucesso!');
+      setItemName('');
+      setItemDesc('');
+      setItemPrice('');
+      setItemCategoryId('');
+      setModalVisible(false);
+    } catch (error) {
+      Alert.alert('Erro', error instanceof Error ? error.message : 'Erro desconhecido');
+    }
+  };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Itens Disponíveis</Text>
-      
-      {/* Filtros */}
+
       <View style={styles.filters}>
-        <Button title="Todos" onPress={() => setFilter(null)} />
-        <Button title="Ferramentas" onPress={() => setFilter('Ferramentas')} />
-        <Button title="Livros" onPress={() => setFilter('Livros')} />
-        <Button title="Eletrônicos" onPress={() => setFilter('Eletrônicos')} />
+        <Pressable onPress={() => setFilter(null)}><Text style={styles.filterText}>Todos</Text></Pressable>
+        <Pressable onPress={() => setFilter('Ferramentas')}><Text style={styles.filterText}>Ferramentas</Text></Pressable>
+        <Pressable onPress={() => setFilter('Livros')}><Text style={styles.filterText}>Livros</Text></Pressable>
+        <Pressable onPress={() => setFilter('Eletrônicos')}><Text style={styles.filterText}>Eletrônicos</Text></Pressable>
       </View>
 
-      {/* Lista de Itens */}
       <FlatList
         data={filteredItems}
         keyExtractor={(item) => item.id}
@@ -51,41 +93,71 @@ const Index = () => {
         )}
       />
 
-      {/* Botão de Adicionar */}
-      <TouchableOpacity style={styles.addButton} onPress={() => alert('Adicionar novo item')}>
-        <Pressable onPress={() => router.push('/(tabs)/adicionar')}>
+      <TouchableOpacity style={styles.addButton} onPress={() => setModalVisible(true)}>
         <Text style={styles.addButtonText}>+</Text>
-        </Pressable>
       </TouchableOpacity>
+
+      {/* Modal de Adição */}
+      <Modal
+        visible={modalVisible}
+        transparent
+        animationType="slide"
+        onRequestClose={() => setModalVisible(false)}
+      >
+        <View style={styles.modalOverlay}>
+          <View style={styles.modalContainer}>
+            <Text style={styles.modalTitle}>Adicionar Novo Item</Text>
+
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Nome do item"
+              value={itemName}
+              onChangeText={setItemName}
+            />
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Descrição"
+              value={itemDesc}
+              onChangeText={setItemDesc}
+            />
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Preço (ex: 10.99)"
+              value={itemPrice}
+              onChangeText={setItemPrice}
+              keyboardType="decimal-pad"
+            />
+            <TextInput
+              style={styles.modalInput}
+              placeholder="ID da Categoria (ex: 1)"
+              value={itemCategoryId}
+              onChangeText={setItemCategoryId}
+              keyboardType="numeric"
+            />
+
+            <View style={styles.modalButtons}>
+              <Pressable style={styles.cancelButton} onPress={() => setModalVisible(false)}>
+                <Text style={{ color: '#fff' }}>Cancelar</Text>
+              </Pressable>
+
+              <Pressable style={styles.saveButton} onPress={saveItem}>
+                <Text style={{ color: '#fff' }}>Salvar</Text>
+              </Pressable>
+            </View>
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-    backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    marginBottom: 16,
-  },
-  filters: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 16,
-  },
-  item: {
-    padding: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#ccc',
-  },
-  itemName: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
+  container: { flex: 1, padding: 16, backgroundColor: '#fff' },
+  title: { fontSize: 24, fontWeight: 'bold', marginBottom: 16 },
+  filters: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 16 },
+  filterText: { fontSize: 16, color: '#007BFF' },
+  item: { padding: 16, borderBottomWidth: 1, borderBottomColor: '#ccc' },
+  itemName: { fontSize: 18, fontWeight: 'bold' },
   addButton: {
     position: 'absolute',
     bottom: 16,
@@ -97,10 +169,42 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  addButtonText: {
-    color: '#fff',
-    fontSize: 24,
-    fontWeight: 'bold',
+  addButtonText: { color: '#fff', fontSize: 24, fontWeight: 'bold' },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContainer: {
+    width: '80%',
+    backgroundColor: '#fff',
+    padding: 20,
+    borderRadius: 12,
+    elevation: 5,
+  },
+  modalTitle: { fontSize: 18, fontWeight: 'bold', marginBottom: 12 },
+  modalInput: {
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 10,
+    marginBottom: 12,
+  },
+  modalButtons: { flexDirection: 'row', justifyContent: 'space-between' },
+  cancelButton: {
+    backgroundColor: '#dc3545',
+    padding: 10,
+    borderRadius: 8,
+    width: '45%',
+    alignItems: 'center',
+  },
+  saveButton: {
+    backgroundColor: '#28a745',
+    padding: 10,
+    borderRadius: 8,
+    width: '45%',
+    alignItems: 'center',
   },
 });
 
