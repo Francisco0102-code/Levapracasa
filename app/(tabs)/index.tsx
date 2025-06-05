@@ -20,6 +20,7 @@ const Index = () => {
   const [items, setItems] = useState(initialItems);
   const [filter, setFilter] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   // Campos do formulário
   const [itemName, setItemName] = useState('');
@@ -35,6 +36,7 @@ const Index = () => {
       return;
     }
 
+    setLoading(true);
     try {
       const response = await fetch('http://localhost:8000/api/items', {
         method: 'POST',
@@ -45,7 +47,7 @@ const Index = () => {
           name: itemName,
           description: itemDesc,
           price: parseFloat(itemPrice),
-          category_id: parseInt(itemCategoryId),
+          category_id: parseInt(itemCategoryId, 10),
         }),
       });
 
@@ -56,17 +58,22 @@ const Index = () => {
       }
 
       const newItem = await response.json();
-
       setItems(prev => [...prev, newItem]);
       Alert.alert('Sucesso', 'Item salvo com sucesso!');
-      setItemName('');
-      setItemDesc('');
-      setItemPrice('');
-      setItemCategoryId('');
+      resetForm();
       setModalVisible(false);
     } catch (error) {
       Alert.alert('Erro', error instanceof Error ? error.message : 'Erro desconhecido');
+    } finally {
+      setLoading(false);
     }
+  };
+
+  const resetForm = () => {
+    setItemName('');
+    setItemDesc('');
+    setItemPrice('');
+    setItemCategoryId('');
   };
 
   return (
@@ -140,8 +147,8 @@ const Index = () => {
                 <Text style={{ color: '#fff' }}>Cancelar</Text>
               </Pressable>
 
-              <Pressable style={styles.saveButton} onPress={saveItem}>
-                <Text style={{ color: '#fff' }}>Salvar</Text>
+              <Pressable style={styles.saveButton} onPress={saveItem} disabled={loading}>
+                <Text style={{ color: '#fff' }}>{loading ? 'Salvando...' : 'Salvar'}</Text>
               </Pressable>
             </View>
           </View>

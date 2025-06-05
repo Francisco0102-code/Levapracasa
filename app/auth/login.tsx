@@ -129,7 +129,7 @@ const Login = () => {
           )}
         </Pressable>
 
-        <Pressable onPress={() => router.replace("/(tabs)")}>
+        <Pressable onPress={() => router.replace("/auth/register")}>
           <Text style={styles.loginText}>
             Ainda não tem uma conta? Cadastre-se aqui.
           </Text>
