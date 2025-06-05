@@ -39,9 +39,13 @@ const Index = () => {
     setLoading(true);
     try {
       const response = await fetch('http://localhost:8000/api/items', {
+
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          "Accept": "application/json",// se eu tira da erro cors
+          
+
         },
         body: JSON.stringify({
           name: itemName,
