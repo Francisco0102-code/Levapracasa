@@ -25,13 +25,14 @@ const Index = () => {
   // Campos do formulário
   const [itemName, setItemName] = useState('');
   const [itemDesc, setItemDesc] = useState('');
-  const [itemPrice, setItemPrice] = useState('');
   const [itemCategoryId, setItemCategoryId] = useState('');
+
+  const [returnDate, setexpiry_date] = useState(''); // Data de devolução do item
 
   const filteredItems = filter ? items.filter(item => item.category === filter) : items;
 
   const saveItem = async () => {
-    if (!itemName || !itemDesc || !itemPrice || !itemCategoryId) {
+    if (!itemName || !itemDesc ||  !itemCategoryId || !setexpiry_date) {
       Alert.alert('Erro', 'Preencha todos os campos');
       return;
     }
@@ -50,8 +51,8 @@ const Index = () => {
         body: JSON.stringify({
           name: itemName,
           description: itemDesc,
-          price: parseFloat(itemPrice),
           category_id: parseInt(itemCategoryId, 10),
+          expiry_date: new Date().toISOString().split('T')[0], // Data atual no formato YYYY-MM-DD
         }),
       });
 
@@ -76,8 +77,8 @@ const Index = () => {
   const resetForm = () => {
     setItemName('');
     setItemDesc('');
-    setItemPrice('');
     setItemCategoryId('');
+    setexpiry_date('');
   };
 
   return (
@@ -131,19 +132,20 @@ const Index = () => {
               value={itemDesc}
               onChangeText={setItemDesc}
             />
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Preço (ex: 10.99)"
-              value={itemPrice}
-              onChangeText={setItemPrice}
-              keyboardType="decimal-pad"
-            />
+  
             <TextInput
               style={styles.modalInput}
               placeholder="ID da Categoria (ex: 1)"
               value={itemCategoryId}
               onChangeText={setItemCategoryId}
               keyboardType="numeric"
+            />
+            <TextInput
+              style={styles.modalInput}
+              placeholder="Data de Devolução (ex: 2025-05-30)"
+              value={returnDate}
+              onChangeText={setexpiry_date}
+              keyboardType="default"
             />
 
             <View style={styles.modalButtons}>

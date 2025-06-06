@@ -50,10 +50,11 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [tel, setTel] = useState("");
   const [loading, setLoading] = useState(false);
+  const [local, setLocal] = useState(""); // Localização do item
   const [error, setError] = useState("");
 
   const handleSaveUserDriver = async () => {
-    if (!name || !email || !tel || !password) {
+    if (!name || !email || !tel || !password || !local) {
       Alert.alert("Atenção", "Preencha todos os campos.");
       return;
     }
@@ -68,7 +69,7 @@ const Register = () => {
           "Content-Type": "application/json",
           "Accept": "application/json"
         },
-        body: JSON.stringify({ name, email, telephone:tel, password }),
+        body: JSON.stringify({ name, email, telephone:tel, password, local, }),
       });
 
       const data = await response.json();
@@ -133,6 +134,16 @@ const Register = () => {
           placeholder="Digite sua senha" 
           secureTextEntry 
         />
+
+        <InputField
+          label="Localização"
+          value={local}
+          onChangeText={setLocal}
+          placeholder="Digite sua localização"
+          keyboardType="default"
+        />
+
+
 
         {error ? <Text style={styles.errorText}>{error}</Text> : null}
 
