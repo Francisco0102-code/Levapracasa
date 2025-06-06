@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -27,19 +27,19 @@ const Index = () => {
   const [itemDesc, setItemDesc] = useState('');
   const [itemCategoryId, setItemCategoryId] = useState('');
 
-  const [returnDate, setexpiry_date] = useState(''); // Data de devolução do item
+  const [itemexpiry_date, setexpiry_date] = useState(''); // Data de devolução do item
 
   const filteredItems = filter ? items.filter(item => item.category === filter) : items;
 
   const saveItem = async () => {
-    if (!itemName || !itemDesc ||  !itemCategoryId || !setexpiry_date) {
+    if (!itemName || !itemDesc ||  !itemCategoryId || !itemexpiry_date) {
       Alert.alert('Erro', 'Preencha todos os campos');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/items', {
+      const response = await fetch('http://localhost:8000/api/items',  {
 
         method: 'POST',
         headers: {
@@ -77,9 +77,37 @@ const Index = () => {
   const resetForm = () => {
     setItemName('');
     setItemDesc('');
-    setItemCategoryId('');
-    setexpiry_date('');
+    setItemCategoryId("");
+    setexpiry_date("");
   };
+
+  useEffect(() => {
+    const fetchItems = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/items', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+          },
+        });
+  
+        if (!response.ok) {
+          const errorData = await response.json();
+          Alert.alert('Erro', errorData.message || 'Erro ao buscar itens');
+          return;
+        }
+  
+        const data = await response.json();
+        setItems(data); // Atualiza a lista com os itens da API
+      } catch (error) {
+        Alert.alert('Erro', error instanceof Error ? error.message : 'Erro desconhecido ao buscar itens');
+      }
+    };
+  
+    fetchItems();
+  }, []);
+  
 
   return (
     <View style={styles.container}>
@@ -100,7 +128,7 @@ const Index = () => {
             <Text style={styles.itemName}>{item.name}</Text>
             <Text>{item.description}</Text>
             <Text>Localização: {item.location}</Text>
-            <Text>Prazo de Devolução: {item.returnDate}</Text>
+            <Text>Prazo de Devolução: {item.expiry_date}</Text>
           </View>
         )}
       />
@@ -143,7 +171,7 @@ const Index = () => {
             <TextInput
               style={styles.modalInput}
               placeholder="Data de Devolução (ex: 2025-05-30)"
-              value={returnDate}
+              value={itemexpiry_date}
               onChangeText={setexpiry_date}
               keyboardType="default"
             />
