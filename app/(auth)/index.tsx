@@ -76,7 +76,7 @@ const Register = () => {
 
       if (response.ok) {
         Alert.alert("Sucesso", "Cadastro realizado com sucesso!");
-        router.push("/auth/login");
+        router.push("/(auth)/login");
       } else {
         setError(data.message || "Erro ao cadastrar usuário");
       }
@@ -159,7 +159,7 @@ const Register = () => {
           )}
         </Pressable>
 
-        <Pressable onPress={() => router.push('/auth/login')}>
+        <Pressable onPress={() => router.push('/(auth)/login')}>
           <Text style={styles.loginText}>
             Já tem uma conta? Faça login aqui.
           </Text>

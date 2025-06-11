@@ -11,48 +11,65 @@ import {
   Alert,
 } from 'react-native';
 
-const initialItems = [
-  { id: '1', name: 'Furadeira', description: 'Furadeira elétrica', location: 'São Paulo', returnDate: '30/05/2025', category: 'Ferramentas' },
-  { id: '2', name: 'Livro de JavaScript', description: 'Livro sobre programação', location: 'Rio de Janeiro', returnDate: '05/06/2025', category: 'Livros' },
-];
+const categoryMap: { [key: number]: string } = {
+  1: 'Ferramentas',
+  2: 'Livros',
+  3: 'Eletrônicos',
+};
+
+const categoryNameToId = (name: string): number | null => {
+  const entry = Object.entries(categoryMap).find(([, value]) => value === name);
+  return entry ? parseInt(entry[0], 10) : null;
+};
 
 const Index = () => {
-  const [items, setItems] = useState(initialItems);
+  const [items, setItems] = useState([]);
   const [filter, setFilter] = useState<string | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // Campos do formulário
+  // Form inputs
   const [itemName, setItemName] = useState('');
   const [itemDesc, setItemDesc] = useState('');
   const [itemCategoryId, setItemCategoryId] = useState('');
+  const [itemexpiry_date, setexpiry_date] = useState('');
 
-  const [itemexpiry_date, setexpiry_date] = useState(''); // Data de devolução do item
+  const filteredItems = filter
+    ? items.filter(item => categoryMap[item.category_id] === filter)
+    : items;
 
-  const filteredItems = filter ? items.filter(item => item.category === filter) : items;
+  const resetForm = () => {
+    setItemName('');
+    setItemDesc('');
+    setItemCategoryId('');
+    setexpiry_date('');
+  };
 
   const saveItem = async () => {
-    if (!itemName || !itemDesc ||  !itemCategoryId || !itemexpiry_date) {
+    if (!itemName || !itemDesc || !itemCategoryId || !itemexpiry_date) {
       Alert.alert('Erro', 'Preencha todos os campos');
+      return;
+    }
+
+    const categoryId = categoryNameToId(itemCategoryId);
+    if (!categoryId) {
+      Alert.alert('Erro', 'Categoria inválida');
       return;
     }
 
     setLoading(true);
     try {
-      const response = await fetch('http://localhost:8000/api/items',  {
-
+      const response = await fetch('http://localhost:8000/api/items', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          "Accept": "application/json",// se eu tira da erro cors
-          
-
+          Accept: 'application/json',
         },
         body: JSON.stringify({
           name: itemName,
           description: itemDesc,
-          category_id: parseInt(itemCategoryId, 10),
-          expiry_date: new Date().toISOString().split('T')[0], // Data atual no formato YYYY-MM-DD
+          category_id: categoryId,
+          expiry_date: itemexpiry_date,
         }),
       });
 
@@ -74,13 +91,6 @@ const Index = () => {
     }
   };
 
-  const resetForm = () => {
-    setItemName('');
-    setItemDesc('');
-    setItemCategoryId("");
-    setexpiry_date("");
-  };
-
   useEffect(() => {
     const fetchItems = async () => {
       try {
@@ -91,23 +101,48 @@ const Index = () => {
             Accept: 'application/json',
           },
         });
-  
+
         if (!response.ok) {
           const errorData = await response.json();
           Alert.alert('Erro', errorData.message || 'Erro ao buscar itens');
           return;
         }
-  
+
         const data = await response.json();
-        setItems(data); // Atualiza a lista com os itens da API
+        setItems(data);
       } catch (error) {
         Alert.alert('Erro', error instanceof Error ? error.message : 'Erro desconhecido ao buscar itens');
       }
     };
-  
+
     fetchItems();
   }, []);
-  
+
+  useEffect(() => {
+    const fetchItemOne = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/api/items/1', {
+          method: 'GET',
+          headers: {
+            Accept: 'application/json',
+          },
+        });
+
+        if (!response.ok) {
+          const error = await response.json();
+          console.warn('Erro ao buscar item 1:', error.message);
+          return;
+        }
+
+        const item = await response.json();
+        console.log('Item com ID 1:', item);
+      } catch (err) {
+        console.warn('Erro ao buscar item 1:', err instanceof Error ? err.message : 'Erro desconhecido');
+      }
+    };
+
+    fetchItemOne();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -122,11 +157,12 @@ const Index = () => {
 
       <FlatList
         data={filteredItems}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <View style={styles.item}>
             <Text style={styles.itemName}>{item.name}</Text>
             <Text>{item.description}</Text>
+            <Text>Categoria: {categoryMap[item.category_id]}</Text>
             <Text>Localização: {item.location}</Text>
             <Text>Prazo de Devolução: {item.expiry_date}</Text>
           </View>
@@ -160,20 +196,17 @@ const Index = () => {
               value={itemDesc}
               onChangeText={setItemDesc}
             />
-  
             <TextInput
               style={styles.modalInput}
-              placeholder="ID da Categoria (ex: 1)"
+              placeholder="Categoria (ex: Ferramentas)"
               value={itemCategoryId}
               onChangeText={setItemCategoryId}
-              keyboardType="numeric"
             />
             <TextInput
               style={styles.modalInput}
               placeholder="Data de Devolução (ex: 2025-05-30)"
               value={itemexpiry_date}
               onChangeText={setexpiry_date}
-              keyboardType="default"
             />
 
             <View style={styles.modalButtons}>

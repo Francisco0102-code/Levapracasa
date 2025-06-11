@@ -73,7 +73,7 @@ const Login = () => {
 
       if (response.ok) {
         Alert.alert("Sucesso", "Login realizado com sucesso!");
-        router.replace("/(tabs)"); // Altere para a rota principal do seu app
+        router.replace("/(tabs)/home"); // Altere para a rota principal do seu app
       } else {
         setError(data.message || "Email ou senha inválidos.");
       }
@@ -129,7 +129,7 @@ const Login = () => {
           )}
         </Pressable>
 
-        <Pressable onPress={() => router.replace("/auth/register")}>
+        <Pressable onPress={() => router.replace("/auth/index")}>
           <Text style={styles.loginText}>
             Ainda não tem uma conta? Cadastre-se aqui.
           </Text>
