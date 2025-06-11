@@ -9,7 +9,6 @@ import {
   ActivityIndicator,
 } from "react-native";
 import React, { useState } from "react";
-import { MaterialIcons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 
 type InputFieldProps = {
@@ -49,8 +48,8 @@ const Register = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [tel, setTel] = useState("");
+  const [local, setLocal] = useState("");
   const [loading, setLoading] = useState(false);
-  const [local, setLocal] = useState(""); // Localização do item
   const [error, setError] = useState("");
 
   const handleSaveUserDriver = async () => {
@@ -65,11 +64,11 @@ const Register = () => {
     try {
       const response = await fetch("http://localhost:8000/api/register", {
         method: "POST",
-        headers: { 
+        headers: {
           "Content-Type": "application/json",
-          "Accept": "application/json"
+          "Accept": "application/json",
         },
-        body: JSON.stringify({ name, email, telephone:tel, password, local, }),
+        body: JSON.stringify({ name, email, telephone: tel, password, local }),
       });
 
       const data = await response.json();
@@ -81,7 +80,8 @@ const Register = () => {
         setError(data.message || "Erro ao cadastrar usuário");
       }
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Erro desconhecido";
+      const errorMessage =
+        error instanceof Error ? error.message : "Erro desconhecido";
       setError(errorMessage);
     } finally {
       setLoading(false);
@@ -90,81 +90,73 @@ const Register = () => {
 
   return (
     <View style={styles.container}>
-      {/* Cabeçalho */}
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" color="#fff" size={24} />
-        </Pressable>
-        <Text style={styles.headerText}>Criar Conta</Text>
-      </View>
+      <View style={styles.card}>
+        <ScrollView contentContainerStyle={styles.form} showsVerticalScrollIndicator={false}>
+          <Text style={styles.headerText}>Criar Conta</Text>
 
-      {/* Formulário */}
-      <ScrollView contentContainerStyle={styles.form}>
-        <Text style={styles.subtitle}>
-          Preencha as informações abaixo para criar sua conta:
-        </Text>
-
-        <InputField 
-          label="Nome Completo" 
-          value={name} 
-          onChangeText={setName} 
-          placeholder="Digite seu nome" 
-        />
-        
-        <InputField 
-          label="Email" 
-          value={email} 
-          onChangeText={setEmail} 
-          placeholder="Digite seu email" 
-          keyboardType="email-address" 
-        />
-        
-        <InputField 
-          label="Telefone/WhatsApp" 
-          value={tel} 
-          onChangeText={setTel} 
-          placeholder="(XX) XXXXX-XXXX" 
-          keyboardType="numeric" 
-        />
-        
-        <InputField 
-          label="Senha" 
-          value={password} 
-          onChangeText={setPassword} 
-          placeholder="Digite sua senha" 
-          secureTextEntry 
-        />
-
-        <InputField
-          label="Localização"
-          value={local}
-          onChangeText={setLocal}
-          placeholder="Digite sua localização"
-          keyboardType="default"
-        />
-
-
-
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-        <Pressable 
-          style={[styles.button, loading && styles.buttonDisabled]} 
-          onPress={handleSaveUserDriver} 
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Cadastrar</Text>
-          )}
-        </Pressable>
-
-        <Pressable onPress={() => router.push('/(auth)/login')}>
-          <Text style={styles.loginText}>
-            Já tem uma conta? Faça login aqui.
+          <Text style={styles.subtitle}>
+            Preencha as informações abaixo para criar sua conta:
           </Text>
-        </Pressable>
-      </ScrollView>
+
+          <InputField
+            label="Nome Completo"
+            value={name}
+            onChangeText={setName}
+            placeholder="Digite seu nome"
+          />
+
+          <InputField
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Digite seu email"
+            keyboardType="email-address"
+          />
+
+          <InputField
+            label="Telefone/WhatsApp"
+            value={tel}
+            onChangeText={setTel}
+            placeholder="(XX) XXXXX-XXXX"
+            keyboardType="numeric"
+          />
+
+          <InputField
+            label="Senha"
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Digite sua senha"
+            secureTextEntry
+          />
+
+          <InputField
+            label="Localização"
+            value={local}
+            onChangeText={setLocal}
+            placeholder="Digite sua localização"
+          />
+
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          <Pressable
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleSaveUserDriver}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Cadastrar</Text>
+            )}
+          </Pressable>
+
+          <Pressable onPress={() => router.push("/(auth)/login")}>
+            <Text style={styles.loginText}>
+              Já tem uma conta? Faça login aqui.
+            </Text>
+          </Pressable>
+        </ScrollView>
+      </View>
     </View>
   );
 };
@@ -172,32 +164,38 @@ const Register = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
-  },
-  header: {
-    backgroundColor: "#1E1E1E",
-    height: 100,
-    paddingTop: 48,
-    paddingHorizontal: 16,
-    flexDirection: "row",
+    backgroundColor: "#EFEFEF",
+    justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 16,
   },
-  backButton: {
-    marginRight: 12,
-  },
-  headerText: {
-    color: "#FFF",
-    fontSize: 22,
-    fontWeight: "bold",
+  card: {
+    width: "100%",
+    maxWidth: 400,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 24,
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   form: {
-    padding: 24,
-    paddingBottom: 40,
+    paddingBottom: 20,
+  },
+  headerText: {
+    color: "#1E1E1E",
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
   },
   subtitle: {
-    fontSize: 18,
-    marginBottom: 24,
+    fontSize: 16,
+    marginBottom: 20,
     color: "#333",
+    textAlign: "center",
   },
   label: {
     fontSize: 14,

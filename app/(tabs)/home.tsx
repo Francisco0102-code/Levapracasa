@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
   itemName: { fontSize: 18, fontWeight: 'bold' },
   addButton: {
     position: 'absolute',
-    bottom: 16,
+    bottom: 90,
     right: 16,
     backgroundColor: '#007BFF',
     width: 56,

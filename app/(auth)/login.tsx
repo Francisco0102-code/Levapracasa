@@ -73,7 +73,7 @@ const Login = () => {
 
       if (response.ok) {
         Alert.alert("Sucesso", "Login realizado com sucesso!");
-        router.replace("/(tabs)/home"); // Altere para a rota principal do seu app
+        router.replace("/(tabs)/home");
       } else {
         setError(data.message || "Email ou senha inválidos.");
       }
@@ -87,54 +87,51 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <MaterialIcons name="arrow-back" color="#fff" size={24} />
-        </Pressable>
-        <Text style={styles.headerText}>Login</Text>
-      </View>
+      <View style={styles.card}>
+        <ScrollView contentContainerStyle={styles.form} showsVerticalScrollIndicator={false}>
+          <Pressable onPress={() => router.back()} style={styles.backButton}>
+            <MaterialIcons name="arrow-back" color="#1E1E1E" size={24} />
+          </Pressable>
 
-      <ScrollView contentContainerStyle={styles.form}>
-        <Text style={styles.subtitle}>
-          Entre com seu email e senha para continuar:
-        </Text>
+          <Text style={styles.headerText}>Login</Text>
 
-        <InputField
-          label="Email"
-          value={email}
-          onChangeText={setEmail}
-          placeholder="Digite seu email"
-          keyboardType="email-address"
-        />
-
-        <InputField
-          label="Senha"
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Digite sua senha"
-          secureTextEntry
-        />
-
-        {error ? <Text style={styles.errorText}>{error}</Text> : null}
-
-        <Pressable
-          style={[styles.button, loading && styles.buttonDisabled]}
-          onPress={handleLogin}
-          disabled={loading}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.buttonText}>Entrar</Text>
-          )}
-        </Pressable>
-
-        <Pressable onPress={() => router.replace("/auth/index")}>
-          <Text style={styles.loginText}>
-            Ainda não tem uma conta? Cadastre-se aqui.
+          <Text style={styles.subtitle}>
+            Entre com seu email e senha para continuar:
           </Text>
-        </Pressable>
-      </ScrollView>
+
+          <InputField
+            label="Email"
+            value={email}
+            onChangeText={setEmail}
+            placeholder="Digite seu email"
+            keyboardType="email-address"
+          />
+
+          <InputField
+            label="Senha"
+            value={password}
+            onChangeText={setPassword}
+            placeholder="Digite sua senha"
+            secureTextEntry
+          />
+
+          {error ? <Text style={styles.errorText}>{error}</Text> : null}
+
+          <Pressable
+            style={[styles.button, loading && styles.buttonDisabled]}
+            onPress={handleLogin}
+            disabled={loading}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.buttonText}>Entrar</Text>
+            )}
+          </Pressable>
+
+  
+        </ScrollView>
+      </View>
     </View>
   );
 };
@@ -142,32 +139,41 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F8F9FA",
-  },
-  header: {
-    backgroundColor: "#1E1E1E",
-    height: 100,
-    paddingTop: 48,
-    paddingHorizontal: 16,
-    flexDirection: "row",
+    backgroundColor: "#F0F2F5",
+    justifyContent: "center",
     alignItems: "center",
+    paddingHorizontal: 16,
   },
-  backButton: {
-    marginRight: 12,
-  },
-  headerText: {
-    color: "#FFF",
-    fontSize: 22,
-    fontWeight: "bold",
+  card: {
+    width: "100%",
+    maxWidth: 400,
+    backgroundColor: "#fff",
+    borderRadius: 16,
+    padding: 24,
+    elevation: 10,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
   },
   form: {
-    padding: 24,
-    paddingBottom: 40,
+    paddingBottom: 20,
+  },
+  backButton: {
+    marginBottom: 16,
+  },
+  headerText: {
+    color: "#1E1E1E",
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 16,
+    textAlign: "center",
   },
   subtitle: {
-    fontSize: 18,
-    marginBottom: 24,
+    fontSize: 16,
+    marginBottom: 20,
     color: "#333",
+    textAlign: "center",
   },
   label: {
     fontSize: 14,

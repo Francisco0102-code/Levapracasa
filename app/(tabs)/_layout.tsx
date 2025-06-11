@@ -3,11 +3,10 @@ import React from 'react';
 import { Platform } from 'react-native';
 
 import { HapticTab } from '@/components/HapticTab';
-import { IconSymbol } from '@/components/ui/IconSymbol';
-import TabBarBackground from '@/components/ui/TabBarBackground';
 import { Colors } from '@/constants/Colors';
 import { useColorScheme } from '@/hooks/useColorScheme';
-import AntDesign from '@expo/vector-icons/AntDesign';
+import Entypo from '@expo/vector-icons/Entypo';
+import Fontisto from '@expo/vector-icons/Fontisto';
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
@@ -15,32 +14,55 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
+        tabBarActiveTintColor: '#fff', // ícone ativo branco
+        tabBarInactiveTintColor: '#aaa', // ícone inativo
         headerShown: false,
         tabBarButton: HapticTab,
-        tabBarBackground: TabBarBackground,
-        tabBarStyle: Platform.select({
-          ios: {
-            // Use a transparent background on iOS to show the blur effect
-            position: 'absolute',
-          },
-          default: {},
-        }),
-      }}>
+        tabBarStyle: {
+          position: 'absolute',
+          bottom: 16,
+          left: 16,
+          right: 16,
+          elevation: 5,
+          backgroundColor: '#000', // cor preta
+          borderRadius: 20,
+          height: 60,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 5 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          borderTopWidth: 0,
+        },
+      }}
+    >
       <Tabs.Screen
         name="home"
         options={{
           title: 'Home',
-          tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
+          tabBarIcon: ({ color }) => (
+            <Fontisto name="home" size={24} color={color} />
+          ),
         }}
       />
       <Tabs.Screen
-        name="adicionar"
+        name="Emprestados"
         options={{
-          title: 'Adicionar',
-          tabBarIcon: ({ color }) => <AntDesign size={28} name="plus" color={color}/>,
+          title: 'Emprestados',
+          tabBarIcon: ({ color }) => (
+            <Entypo name="dropbox" size={24} color={color} />
+          ),
         }}
       />
+            <Tabs.Screen
+        name="chat"
+        options={{
+          title: 'Conversa',
+          tabBarIcon: ({ color }) => (
+            <Entypo name="chat" size={24} color={color} />
+          ),
+        }}
+      />
+
     </Tabs>
   );
 }
